@@ -32,6 +32,32 @@ directly with a `file://` URL.
 
 Run `npm run lint` and `npm run typecheck` for standalone checks.
 
+### GitHub Pages
+
+The [Pages workflow](.github/workflows/deploy-pages.yml) builds and deploys the
+site on each push to `main`. It can also be run manually from the Actions tab.
+
+One-time setup:
+
+1. In the GitHub repository, open **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. Commit and push the workflow to `main`, then check **Actions → Deploy to
+	GitHub Pages** for the deployment result.
+
+The default site URL for this repository is:
+[https://charisma-ai.github.io/charisma-static-graph-viewer/](https://charisma-ai.github.io/charisma-static-graph-viewer/).
+The workflow's deployment summary links to the actual published URL.
+
+GitHub Actions runs `npm ci`, lint, and the production build, then uploads only
+`dist/` as the Pages artifact. **Do not commit `dist/`**: it is generated and
+gitignored. No separate `build/`, `docs/`, or `gh-pages` branch is needed, and
+there is no server process to start on GitHub Pages.
+
+Vite's `base: "./"` makes asset URLs relative, which supports the repository
+subdirectory as well as a custom domain. The viewer has no URL-based routes,
+so it needs no SPA fallback or custom 404 page. Story exports remain in browser
+memory and are not included in the deployed artifact or uploaded by the app.
+
 ## Load a story
 
 Click **Open Project** and choose a Charisma JSON export from your computer,
