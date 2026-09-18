@@ -1,9 +1,8 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Project guidance
 
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+- This is a static React + TypeScript site built with Vite and Tailwind CSS.
+- Keep story exports in browser memory. Do not add uploads, API routes, or server-side file loading.
+- The entry point is `src/main.tsx`; shared styles are in `src/globals.css`.
+- Use the `@/` alias for imports from `src/`.
+- Run `npm run lint` and `npm run build` to validate changes.
+- Deploy only `dist/`; no application server is required.

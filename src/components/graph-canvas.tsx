@@ -1,5 +1,3 @@
-"use client";
-
 import { nodeTypes } from "@/components/nodes";
 import type { CanvasNodeData } from "@/lib/project";
 import {

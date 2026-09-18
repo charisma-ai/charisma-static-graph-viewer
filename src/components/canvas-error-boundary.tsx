@@ -1,5 +1,3 @@
-"use client";
-
 import { Component, type ReactNode } from "react";
 
 type Props = { children: ReactNode };
@@ -17,7 +15,9 @@ export class CanvasErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
           <h2 className="text-lg font-semibold">Graph failed to render</h2>
-          <p className="max-w-md text-sm text-zinc-400">{this.state.error.message}</p>
+          <p className="max-w-md text-sm text-zinc-400">
+            {this.state.error.message}
+          </p>
         </div>
       );
     }

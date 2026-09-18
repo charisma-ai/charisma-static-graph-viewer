@@ -1,12 +1,14 @@
-"use client";
-
 import { CanvasErrorBoundary } from "@/components/canvas-error-boundary";
 import { GraphCanvas } from "@/components/graph-canvas";
 import { OpenProjectButton } from "@/components/open-project-button";
 import { ProjectSidebar } from "@/components/project-sidebar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import type { StoryExport } from "@/lib/export";
 import {
   findSection,
@@ -18,20 +20,19 @@ import {
   type ProjectNav,
 } from "@/lib/project";
 import { ReactFlowProvider } from "@xyflow/react";
-import { AlertCircle, FolderOpen, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  AlertCircle,
+  FolderOpen,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 
 type LoadState =
-  | { status: "loading"; message: string }
   | { status: "empty" }
   | { status: "error"; message: string }
   | { status: "ready" };
-
-type SamplePayload = {
-  nav: ProjectNav;
-  graphId: number | null;
-  graph: GraphView;
-};
 
 export function StoryViewer() {
   const [nav, setNav] = useState<ProjectNav | null>(null);
@@ -39,20 +40,16 @@ export function StoryViewer() {
   const [selectedGraphId, setSelectedGraphId] = useState<number | null>(null);
   const [sourceLabel, setSourceLabel] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<LoadState>({
-    status: "loading",
-    message: "Loading sample…",
+    status: "empty",
   });
-  const [graphLoading, setGraphLoading] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
   const localIndex = useRef<ProjectIndex | null>(null);
-  const usingSample = useRef(true);
 
   const applyLocalProject = useCallback((data: StoryExport, label: string) => {
     const indexed = indexProject(data);
     const nextNav = toProjectNav(indexed);
     localIndex.current = indexed;
-    usingSample.current = false;
     setNav(nextNav);
     setSelectedGraphId(nextNav.preferredGraphId);
     setGraph(
@@ -64,88 +61,24 @@ export function StoryViewer() {
     setLoadState({ status: "ready" });
   }, []);
 
-  const selectGraph = useCallback(async (graphId: number) => {
+  const selectGraph = useCallback((graphId: number) => {
+    if (!localIndex.current) return;
     setSelectedGraphId(graphId);
     setMobileOpen(false);
-    if (localIndex.current) {
-      setGraph(mapGraph(localIndex.current, graphId));
-      return;
-    }
-    if (!usingSample.current) return;
-    setGraphLoading(true);
-    try {
-      const response = await fetch(`/api/sample/graphs/${graphId}`);
-      if (!response.ok) {
-        throw new Error("Could not load that graph.");
-      }
-      const payload = (await response.json()) as GraphView;
-      setGraph(payload);
-    } catch (error) {
-      setLoadState({
-        status: "error",
-        message:
-          error instanceof Error ? error.message : "Could not load that graph.",
-      });
-    } finally {
-      setGraphLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadSample() {
-      setLoadState({ status: "loading", message: "Loading sample…" });
-      try {
-        const response = await fetch("/api/sample");
-        if (cancelled) return;
-        if (response.status === 404) {
-          setLoadState({ status: "empty" });
-          return;
-        }
-        if (!response.ok) {
-          const payload = (await response.json().catch(() => null)) as {
-            error?: string;
-          } | null;
-          throw new Error(payload?.error || "Sample export could not be loaded.");
-        }
-        const data = (await response.json()) as SamplePayload;
-        if (cancelled || !usingSample.current) return;
-        setNav(data.nav);
-        setSelectedGraphId(data.graphId);
-        setSourceLabel("sample export");
-        setLoadState({ status: "ready" });
-        setGraphLoading(true);
-        setGraph({ nodes: [], edges: [] });
-        queueMicrotask(() => {
-          if (cancelled || !usingSample.current) return;
-          setGraph(data.graph ?? { nodes: [], edges: [] });
-          setGraphLoading(false);
-        });
-      } catch (error) {
-        if (cancelled) return;
-        setLoadState({
-          status: "error",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Could not load the bundled sample export.",
-        });
-      }
-    }
-    void loadSample();
-    return () => {
-      cancelled = true;
-    };
+    setGraph(mapGraph(localIndex.current, graphId));
+    setLoadState({ status: "ready" });
   }, []);
 
   const section =
-    nav && selectedGraphId != null ? findSection(nav, selectedGraphId) : undefined;
+    nav && selectedGraphId != null
+      ? findSection(nav, selectedGraphId)
+      : undefined;
 
   const sidebar = nav ? (
     <ProjectSidebar
       project={nav}
       selectedGraphId={selectedGraphId}
-      onSelect={(graphId) => void selectGraph(graphId)}
+      onSelect={selectGraph}
       footer={
         <p className="px-1 text-[11px] leading-snug text-zinc-500">
           {sourceLabel ? `Loaded from ${sourceLabel}` : "No project loaded"}
@@ -228,21 +161,14 @@ export function StoryViewer() {
         </header>
 
         <main className="relative min-h-0 flex-1">
-          {loadState.status === "loading" ? (
-            <div className="flex h-full flex-col items-center justify-center gap-4 px-6">
-              <Skeleton className="h-10 w-64 bg-white/10" />
-              <Skeleton className="h-40 w-full max-w-xl bg-white/8" />
-              <p className="text-sm text-zinc-400">{loadState.message}</p>
-            </div>
-          ) : null}
-
           {loadState.status === "empty" ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
               <FolderOpen className="size-10 text-zinc-500" />
               <h2 className="text-lg font-semibold">No project loaded</h2>
               <p className="max-w-md text-sm text-zinc-400">
-                Place a sample export in <code>data/</code> or click Open
-                Project to import a Charisma JSON file.
+                Click Open Project to choose a Charisma JSON export from your
+                computer. Your file is read locally in your browser and is never
+                uploaded to a server.
               </p>
             </div>
           ) : null}
@@ -251,9 +177,12 @@ export function StoryViewer() {
             <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
               <AlertCircle className="size-10 text-red-400" />
               <h2 className="text-lg font-semibold">Could not load project</h2>
-              <p className="max-w-md text-sm text-zinc-400">{loadState.message}</p>
+              <p className="max-w-md text-sm text-zinc-400">
+                {loadState.message}
+              </p>
               <p className="text-xs text-zinc-500">
-                Use Open Project to import a story export instead.
+                Use Open Project to choose another story export from your
+                computer.
               </p>
             </div>
           ) : null}
@@ -264,14 +193,8 @@ export function StoryViewer() {
             </div>
           ) : null}
 
-          {graphLoading ? (
-            <div className="absolute top-3 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/10 bg-[#151b27]/90 px-3 py-1 text-xs text-zinc-300">
-              Loading graph…
-            </div>
-          ) : null}
-
-          {nav && selectedGraphId != null && loadState.status !== "loading" ? (
-            graph.nodes.length === 0 && !graphLoading ? (
+          {nav && selectedGraphId != null ? (
+            graph.nodes.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
                 <h2 className="text-lg font-semibold">This graph is empty</h2>
                 <p className="text-sm text-zinc-400">
@@ -286,7 +209,7 @@ export function StoryViewer() {
                       graphId={selectedGraphId}
                       nodes={graph.nodes}
                       edges={graph.edges}
-                      onOpenGraph={(graphId) => void selectGraph(graphId)}
+                      onOpenGraph={selectGraph}
                     />
                   </ReactFlowProvider>
                 </CanvasErrorBoundary>

@@ -1,5 +1,3 @@
-"use client";
-
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { CharacterNodeData } from "@/lib/project";
 import { Heart, MessageCircle, Star, Volume2 } from "lucide-react";

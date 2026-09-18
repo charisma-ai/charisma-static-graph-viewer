@@ -1,5 +1,3 @@
-"use client";
-
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { WildcardNodeData } from "@/lib/project";
 import { Sparkle } from "lucide-react";

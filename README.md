@@ -4,6 +4,8 @@ A dark, pan-and-zoom viewer for [Charisma.ai](https://charisma.ai) story JSON ex
 
 ## Run locally
 
+Use Node.js 20.19+ or 22.12+ (Node.js 24 LTS recommended).
+
 ```bash
 npm install
 npm run dev
@@ -11,16 +13,38 @@ npm run dev
 
 Then open [http://localhost:43145](http://localhost:43145). The dev server binds `0.0.0.0:43145`.
 
+## Build and deploy
+
+```bash
+npm run build
+npm run preview
+```
+
+The build type-checks the app and writes a static site to `dist/`. Deploy the
+contents of that directory to any static web host. No Node.js runtime, API,
+database, or server-side rendering is required in production. Asset URLs are
+relative, so the build can also be hosted under a subdirectory.
+
+`npm run preview` (or `npm start`) serves the built site locally at
+[http://localhost:43145](http://localhost:43145) for testing; it is not a
+production server. Serve the files over HTTP(S), rather than opening the HTML
+directly with a `file://` URL.
+
+Run `npm run lint` and `npm run typecheck` for standalone checks.
+
 ## Load a story
 
-The app tries to load a bundled sample export on startup. It looks for files in this order:
+Click **Open Project** and choose a Charisma JSON export from your computer,
+including 15MB+ files. The file is read, parsed, and displayed entirely in your
+browser. It is never uploaded to a server, and switching scenes or subplots uses
+the project already held in browser memory.
 
-1. `data/story-export.json` (already merged)
-2. `data/story-export-part1.json` + `data/story-export-part2.json`
-3. `STORY_EXPORT_PATH` pointing at a single JSON file
-4. The split halves in the project store used by this workspace
+If the file has `_splitMeta`, the viewer asks for the other half and merges the
+parts locally. You can also continue with just one part.
 
-Those JSON files are gitignored and must not be committed. Use **Open Project** to import any export from disk, including 15MB+ files. If the file has `_splitMeta`, the viewer asks for the other half and concatenates graph-scoped tables.
+No bundled sample or server-side export configuration is needed. Projects are
+not persisted: refreshing or closing the page clears the loaded project, so
+choose the file again when you return.
 
 ### Split export rules
 
@@ -30,4 +54,5 @@ Those JSON files are gitignored and must not be committed. Use **Open Project** 
 
 ## Stack
 
-Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, and `@xyflow/react`.
+React, Vite, TypeScript, Tailwind CSS, shadcn/ui, and `@xyflow/react`.
+Geist fonts are bundled locally with the static assets.

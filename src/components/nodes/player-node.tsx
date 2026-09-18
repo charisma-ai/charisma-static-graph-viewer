@@ -1,5 +1,3 @@
-"use client";
-
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { PlayerNodeData } from "@/lib/project";
 import { Link2, Sparkles, Zap } from "lucide-react";

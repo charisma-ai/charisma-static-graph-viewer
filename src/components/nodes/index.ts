@@ -1,5 +1,3 @@
-"use client";
-
 import { CharacterNode } from "@/components/nodes/character-node";
 import { GenericNode } from "@/components/nodes/generic-node";
 import { PlayerNode } from "@/components/nodes/player-node";

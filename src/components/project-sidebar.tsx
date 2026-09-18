@@ -1,11 +1,21 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { countGraphNodes, type FolderGroup, type ProjectNav, type ProjectSection } from "@/lib/project";
+import {
+  countGraphNodes,
+  type FolderGroup,
+  type ProjectNav,
+  type ProjectSection,
+} from "@/lib/project";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronRight, Folder, GitBranch, Layers3, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  GitBranch,
+  Layers3,
+  Search,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 function matchesQuery(name: string, query: string): boolean {
@@ -116,7 +126,8 @@ export function ProjectSidebar({
   const normalized = query.trim().toLowerCase();
 
   const sceneHits = useMemo(
-    () => project.scenes.filter((scene) => matchesQuery(scene.name, normalized)),
+    () =>
+      project.scenes.filter((scene) => matchesQuery(scene.name, normalized)),
     [project.scenes, normalized],
   );
   const unfiledHits = useMemo(
